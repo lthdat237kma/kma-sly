@@ -1,0 +1,116 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
+
+type SensorReading = Tables<"sensor_readings">;
+type ActuatorCommand = Tables<"actuator_commands">;
+type Device = Tables<"devices">;
+
+export function useLatestSensorData() {
+  const [readings, setReadings] = useState<SensorReading[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch latest reading per device
+    const fetch = async () => {
+      const { data } = await supabase
+        .from("sensor_readings")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (data) setReadings(data);
+      setLoading(false);
+    };
+    fetch();
+
+    // Realtime subscription
+    const channel = supabase
+      .channel("sensor-realtime")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "sensor_readings" }, (payload) => {
+        setReadings([payload.new as SensorReading]);
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  return { readings, loading };
+}
+
+export function useHistoryData() {
+  const [history, setHistory] = useState<SensorReading[]>([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase
+        .from("sensor_readings")
+        .select("*")
+        .order("created_at", { ascending: true })
+        .limit(100);
+      if (data) setHistory(data);
+    };
+    fetch();
+  }, []);
+
+  return history;
+}
+
+export function useDevices() {
+  const [devices, setDevices] = useState<Device[]>([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase.from("devices").select("*");
+      if (data) setDevices(data);
+    };
+    fetch();
+
+    const channel = supabase
+      .channel("devices-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "devices" }, () => {
+        fetch();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  return devices;
+}
+
+export function useActuators() {
+  const [actuators, setActuators] = useState<ActuatorCommand[]>([]);
+
+  useEffect(() => {
+    const fetchActuators = async () => {
+      const { data } = await supabase.from("actuator_commands").select("*");
+      if (data) setActuators(data);
+    };
+    fetchActuators();
+
+    const channel = supabase
+      .channel("actuators-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "actuator_commands" }, () => {
+        fetchActuators();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const toggleActuator = async (actuatorId: string, isOn: boolean) => {
+    await supabase
+      .from("actuator_commands")
+      .update({ is_on: isOn, updated_at: new Date().toISOString() })
+      .eq("actuator_id", actuatorId);
+  };
+
+  const setMode = async (actuatorId: string, mode: string) => {
+    await supabase
+      .from("actuator_commands")
+      .update({ mode, updated_at: new Date().toISOString() })
+      .eq("actuator_id", actuatorId);
+  };
+
+  return { actuators, toggleActuator, setMode };
+}
