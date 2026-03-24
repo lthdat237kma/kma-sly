@@ -13,27 +13,23 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const ALLOWED_EMAIL = "admin@dt6a.kma";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
       toast.error("Vui lòng nhập email và mật khẩu");
       return;
     }
+    if (email.trim().toLowerCase() !== ALLOWED_EMAIL) {
+      toast.error("Tài khoản không được phép truy cập");
+      return;
+    }
     setLoading(true);
     try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Đăng nhập thành công!");
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
-        toast.success("Đăng ký thành công! Kiểm tra email để xác nhận tài khoản.");
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast.success("Đăng nhập thành công!");
     } catch (error: any) {
       toast.error(error.message || "Đã xảy ra lỗi");
     } finally {
