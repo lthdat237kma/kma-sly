@@ -1,8 +1,11 @@
-import { Radio, Wifi, Clock } from "lucide-react";
+import { Radio, Wifi, Clock, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 export function DashboardHeader() {
   const [time, setTime] = useState(new Date());
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -36,6 +39,17 @@ export function DashboardHeader() {
             {time.toLocaleTimeString("vi-VN")}
           </span>
         </div>
+        {user && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={signOut}
+            className="text-muted-foreground hover:text-destructive gap-1.5"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="text-xs hidden sm:inline">Đăng xuất</span>
+          </Button>
+        )}
       </div>
     </header>
   );
