@@ -99,17 +99,39 @@ export function useActuators() {
   }, []);
 
   const toggleActuator = async (actuatorId: string, isOn: boolean) => {
-    await supabase
+    // Optimistic update
+    setActuators((prev) =>
+      prev.map((a) => a.actuator_id === actuatorId ? { ...a, is_on: isOn } : a)
+    );
+    const { error } = await supabase
       .from("actuator_commands")
       .update({ is_on: isOn, updated_at: new Date().toISOString() })
       .eq("actuator_id", actuatorId);
+    if (error) {
+      // Revert on error
+      setActuators((prev) =>
+        prev.map((a) => a.actuator_id === actuatorId ? { ...a, is_on: !isOn } : a)
+      );
+      throw error;
+    }
   };
 
   const setMode = async (actuatorId: string, mode: string) => {
-    await supabase
+    const prevMode = mode === "auto" ? "manual" : "auto";
+    // Optimistic update
+    setActuators((prev) =>
+      prev.map((a) => a.actuator_id === actuatorId ? { ...a, mode } : a)
+    );
+    const { error } = await supabase
       .from("actuator_commands")
       .update({ mode, updated_at: new Date().toISOString() })
       .eq("actuator_id", actuatorId);
+    if (error) {
+      setActuators((prev) =>
+        prev.map((a) => a.actuator_id === actuatorId ? { ...a, mode: prevMode } : a)
+      );
+      throw error;
+    }
   };
 
   return { actuators, toggleActuator, setMode };
