@@ -1,14 +1,11 @@
 import { SensorData } from "@/lib/mockData";
 import { Card, CardContent } from "@/components/ui/card";
-import { Thermometer, Droplets, Gauge, Wind, Sun, Leaf } from "lucide-react";
+import { Thermometer, Droplets, Leaf } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
 
 const iconMap: Record<string, React.ElementType> = {
   Thermometer,
   Droplets,
-  Gauge,
-  Wind,
-  Sun,
   Leaf,
 };
 
@@ -16,12 +13,6 @@ const statusColor = {
   normal: "text-primary",
   warning: "text-warning",
   danger: "text-destructive",
-};
-
-const statusGlow = {
-  normal: "glow-primary",
-  warning: "glow-warning",
-  danger: "glow-danger",
 };
 
 const chartColor = {
@@ -36,7 +27,7 @@ export function SensorCard({ sensor }: { sensor: SensorData }) {
   const percentage = ((sensor.value - sensor.min) / (sensor.max - sensor.min)) * 100;
 
   return (
-    <Card className={`relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:${statusGlow[sensor.status]}`}>
+    <Card className="relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300">
       <CardContent className="p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
