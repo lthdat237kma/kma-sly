@@ -102,22 +102,11 @@ export default function Auth() {
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
-              ) : isLogin ? (
-                "Đăng nhập"
               ) : (
-                "Đăng ký"
+                "Đăng nhập"
               )}
             </Button>
           </form>
-
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              {isLogin ? "Chưa có tài khoản? Đăng ký" : "Đã có tài khoản? Đăng nhập"}
-            </button>
-          </div>
         </CardContent>
       </Card>
     </div>
