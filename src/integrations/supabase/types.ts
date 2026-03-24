@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      actuator_commands: {
+        Row: {
+          actuator_id: string
+          id: string
+          is_on: boolean
+          mode: string
+          updated_at: string
+        }
+        Insert: {
+          actuator_id: string
+          id?: string
+          is_on?: boolean
+          mode?: string
+          updated_at?: string
+        }
+        Update: {
+          actuator_id?: string
+          id?: string
+          is_on?: boolean
+          mode?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      devices: {
+        Row: {
+          battery: number | null
+          id: string
+          last_seen: string | null
+          location: string | null
+          mcu: string | null
+          name: string
+          rssi: number | null
+          snr: number | null
+          spreading_factor: number | null
+          status: string
+        }
+        Insert: {
+          battery?: number | null
+          id: string
+          last_seen?: string | null
+          location?: string | null
+          mcu?: string | null
+          name: string
+          rssi?: number | null
+          snr?: number | null
+          spreading_factor?: number | null
+          status?: string
+        }
+        Update: {
+          battery?: number | null
+          id?: string
+          last_seen?: string | null
+          location?: string | null
+          mcu?: string | null
+          name?: string
+          rssi?: number | null
+          snr?: number | null
+          spreading_factor?: number | null
+          status?: string
+        }
+        Relationships: []
+      }
+      sensor_readings: {
+        Row: {
+          created_at: string
+          device_id: string
+          humidity: number | null
+          id: string
+          soil_moisture: number | null
+          temperature: number | null
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          humidity?: number | null
+          id?: string
+          soil_moisture?: number | null
+          temperature?: number | null
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          humidity?: number | null
+          id?: string
+          soil_moisture?: number | null
+          temperature?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
