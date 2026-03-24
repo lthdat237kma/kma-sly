@@ -14,8 +14,8 @@ import { Activity } from "lucide-react";
 
 const chartLines = [
   { key: "temperature", name: "Nhiệt độ (°C)", color: "hsl(162, 100%, 42%)" },
-  { key: "humidity", name: "Độ ẩm (%)", color: "hsl(200, 80%, 55%)" },
-  { key: "airQuality", name: "AQI", color: "hsl(32, 95%, 55%)" },
+  { key: "humidity", name: "Độ ẩm KK (%)", color: "hsl(200, 80%, 55%)" },
+  { key: "soilMoisture", name: "Độ ẩm đất (%)", color: "hsl(32, 95%, 55%)" },
 ];
 
 export function HistoryChart({ data }: { data: HistoryPoint[] }) {
@@ -57,9 +57,7 @@ export function HistoryChart({ data }: { data: HistoryPoint[] }) {
                   color: "hsl(200, 20%, 90%)",
                 }}
               />
-              <Legend
-                wrapperStyle={{ fontSize: "12px", fontFamily: "Inter" }}
-              />
+              <Legend wrapperStyle={{ fontSize: "12px", fontFamily: "Inter" }} />
               {chartLines.map((line) => (
                 <Line
                   key={line.key}

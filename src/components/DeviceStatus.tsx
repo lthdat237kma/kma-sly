@@ -1,12 +1,6 @@
 import { DeviceInfo } from "@/lib/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Radio, Battery, Signal, Wifi } from "lucide-react";
-
-const statusLabel = {
-  online: "Trực tuyến",
-  offline: "Ngoại tuyến",
-  warning: "Cảnh báo",
-};
+import { Radio, Battery, Signal, Cpu } from "lucide-react";
 
 function RssiBar({ rssi }: { rssi: number }) {
   const strength = Math.max(0, Math.min(4, Math.floor((rssi + 120) / 15)));
@@ -24,6 +18,11 @@ function RssiBar({ rssi }: { rssi: number }) {
     </div>
   );
 }
+
+const mcuColor = {
+  ESP32: "text-chart-2",
+  STM32: "text-chart-4",
+};
 
 export function DeviceStatus({ devices }: { devices: DeviceInfo[] }) {
   return (
@@ -51,16 +50,16 @@ export function DeviceStatus({ devices }: { devices: DeviceInfo[] }) {
             </div>
 
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1" title={`RSSI: ${device.rssi} dBm`}>
-                <RssiBar rssi={device.rssi} />
+              <div className="flex items-center gap-1" title={device.mcu}>
+                <Cpu className={`w-3.5 h-3.5 ${mcuColor[device.mcu]}`} />
+                <span className="font-mono text-[11px] hidden sm:inline">{device.mcu}</span>
               </div>
-
-              <div className="flex items-center gap-1" title={`Pin: ${device.battery}%`}>
+              <RssiBar rssi={device.rssi} />
+              <div className="flex items-center gap-1">
                 <Battery className={`w-3.5 h-3.5 ${device.battery < 25 ? "text-destructive" : "text-muted-foreground"}`} />
                 <span className="font-mono text-[11px]">{device.battery}%</span>
               </div>
-
-              <div className="hidden sm:flex items-center gap-1" title={`SF${device.spreadingFactor}`}>
+              <div className="hidden sm:flex items-center gap-1">
                 <Signal className="w-3.5 h-3.5" />
                 <span className="font-mono text-[11px]">SF{device.spreadingFactor}</span>
               </div>
