@@ -48,7 +48,7 @@ export default function Auth() {
       <Card className="w-full max-w-md border-border/50 bg-card/80 backdrop-blur-xl relative z-10 shadow-2xl">
         <CardHeader className="text-center space-y-4 pb-2">
           <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <Wifi className="w-8 h-8 text-primary" />
+            <Flower2 className="w-8 h-8 text-primary-foreground" />
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight font-mono">
