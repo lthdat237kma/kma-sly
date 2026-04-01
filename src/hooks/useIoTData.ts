@@ -77,7 +77,7 @@ export function useDevices() {
     fetch();
 
     const channel = supabase
-      .channel("devices-realtime")
+      .channel(`devices-realtime-${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "devices" }, () => {
         fetch();
       })
