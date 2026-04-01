@@ -11,23 +11,34 @@ export function useLatestSensorData() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch latest reading per device
-    const fetch = async () => {
+    const fetchLatest = async () => {
+      // Get latest reading per device using distinct on device_id
       const { data } = await supabase
         .from("sensor_readings")
         .select("*")
-        .order("created_at", { ascending: false })
-        .limit(1);
-      if (data) setReadings(data);
+        .order("created_at", { ascending: false });
+      if (data) {
+        // Keep only latest per device
+        const latestByDevice = new Map<string, SensorReading>();
+        for (const r of data) {
+          if (!latestByDevice.has(r.device_id)) {
+            latestByDevice.set(r.device_id, r);
+          }
+        }
+        setReadings(Array.from(latestByDevice.values()));
+      }
       setLoading(false);
     };
-    fetch();
+    fetchLatest();
 
-    // Realtime subscription
     const channel = supabase
       .channel("sensor-realtime")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "sensor_readings" }, (payload) => {
-        setReadings([payload.new as SensorReading]);
+        const newReading = payload.new as SensorReading;
+        setReadings((prev) => {
+          const updated = prev.filter((r) => r.device_id !== newReading.device_id);
+          return [...updated, newReading];
+        });
       })
       .subscribe();
 
