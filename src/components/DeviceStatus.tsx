@@ -1,4 +1,15 @@
-import { DeviceInfo } from "@/lib/mockData";
+interface DeviceInfo {
+  id: string;
+  name: string;
+  location: string;
+  status: "online" | "offline" | "warning";
+  rssi: number;
+  snr: number;
+  battery: number;
+  lastSeen: string;
+  spreadingFactor: number;
+  mcu: "ESP32" | "STM32";
+}
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Radio, Battery, Signal, Cpu } from "lucide-react";
 

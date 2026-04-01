@@ -1,4 +1,9 @@
-import { HistoryPoint } from "@/lib/mockData";
+interface HistoryPoint {
+  time: string;
+  temperature: number;
+  humidity: number;
+  soilMoisture: number;
+}
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LineChart,
