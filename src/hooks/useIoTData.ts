@@ -100,7 +100,7 @@ export function useActuators() {
     fetchActuators();
 
     const channel = supabase
-      .channel("actuators-realtime")
+      .channel(`actuators-realtime-${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "actuator_commands" }, () => {
         fetchActuators();
       })
