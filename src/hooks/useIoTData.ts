@@ -32,7 +32,7 @@ export function useLatestSensorData() {
     fetchLatest();
 
     const channel = supabase
-      .channel("sensor-realtime")
+      .channel(`sensor-realtime-${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "sensor_readings" }, (payload) => {
         const newReading = payload.new as SensorReading;
         setReadings((prev) => {
