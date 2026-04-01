@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -32,7 +32,7 @@ export function useLatestSensorData() {
     fetchLatest();
 
     const channel = supabase
-      .channel("sensor-realtime")
+      .channel(`sensor-realtime-${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "sensor_readings" }, (payload) => {
         const newReading = payload.new as SensorReading;
         setReadings((prev) => {
@@ -77,7 +77,7 @@ export function useDevices() {
     fetch();
 
     const channel = supabase
-      .channel("devices-realtime")
+      .channel(`devices-realtime-${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "devices" }, () => {
         fetch();
       })
@@ -100,7 +100,7 @@ export function useActuators() {
     fetchActuators();
 
     const channel = supabase
-      .channel("actuators-realtime")
+      .channel(`actuators-realtime-${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "actuator_commands" }, () => {
         fetchActuators();
       })
