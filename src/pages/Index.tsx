@@ -15,38 +15,37 @@ function getSensorStatus(id: string, value: number): "normal" | "warning" | "dan
   return "normal";
 }
 
+function buildSensorCards(reading: { device_id: string; temperature: number | null; humidity: number | null; soil_moisture: number | null }, history: { temperature: number | null; humidity: number | null; soil_moisture: number | null }[]) {
+  return [
+    {
+      id: `temp-${reading.device_id}`, name: "Nhiệt độ (DHT11)",
+      value: reading.temperature ?? 0, unit: "°C", icon: "Thermometer",
+      min: 0, max: 50,
+      status: getSensorStatus("temp", reading.temperature ?? 0),
+      trend: history.slice(-8).map((h) => h.temperature ?? 0),
+    },
+    {
+      id: `humidity-${reading.device_id}`, name: "Độ ẩm KK (DHT11)",
+      value: reading.humidity ?? 0, unit: "%", icon: "Droplets",
+      min: 20, max: 90,
+      status: "normal" as const,
+      trend: history.slice(-8).map((h) => h.humidity ?? 0),
+    },
+    {
+      id: `soil-${reading.device_id}`, name: "Độ ẩm đất",
+      value: reading.soil_moisture ?? 0, unit: "%", icon: "Leaf",
+      min: 0, max: 100,
+      status: getSensorStatus("soil", reading.soil_moisture ?? 0),
+      trend: history.slice(-8).map((h) => h.soil_moisture ?? 0),
+    },
+  ];
+}
+
 const Index = () => {
   const { readings, loading } = useLatestSensorData();
   const history = useHistoryData();
   const devices = useDevices();
   const { actuators, toggleActuator, setMode } = useActuators();
-
-  const latestReading = readings[0];
-  const sensorCards = latestReading
-    ? [
-        {
-          id: "temp", name: "Nhiệt độ (DHT11)",
-          value: latestReading.temperature ?? 0, unit: "°C", icon: "Thermometer",
-          min: 0, max: 50,
-          status: getSensorStatus("temp", latestReading.temperature ?? 0),
-          trend: history.slice(-8).map((h) => h.temperature ?? 0),
-        },
-        {
-          id: "humidity", name: "Độ ẩm KK (DHT11)",
-          value: latestReading.humidity ?? 0, unit: "%", icon: "Droplets",
-          min: 20, max: 90,
-          status: "normal" as const,
-          trend: history.slice(-8).map((h) => h.humidity ?? 0),
-        },
-        {
-          id: "soil", name: "Độ ẩm đất",
-          value: latestReading.soil_moisture ?? 0, unit: "%", icon: "Leaf",
-          min: 0, max: 100,
-          status: getSensorStatus("soil", latestReading.soil_moisture ?? 0),
-          trend: history.slice(-8).map((h) => h.soil_moisture ?? 0),
-        },
-      ]
-    : [];
 
   const chartData = history.map((r) => ({
     time: new Date(r.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
@@ -66,11 +65,15 @@ const Index = () => {
 
   const actuatorData = actuators.map((a) => ({
     id: a.actuator_id,
-    name: a.actuator_id === "pump" ? "Máy bơm nước" : "Servo Motor",
-    icon: a.actuator_id === "pump" ? "Waves" : "Settings",
+    name: a.actuator_id === "pump" ? "Máy bơm nước (Node 1)"
+      : a.actuator_id === "pump2" ? "Máy bơm nước (Node 2)"
+      : a.actuator_id === "servo" ? "Servo Motor (Node 1)"
+      : a.actuator_id === "servo2" ? "Servo Motor (Node 2)"
+      : a.actuator_id,
+    icon: a.actuator_id.startsWith("pump") ? "Waves" : "Settings",
     isOn: a.is_on,
     mode: a.mode as "manual" | "auto",
-    autoCondition: a.actuator_id === "pump" ? "Bật khi độ ẩm đất < 30%" : "Bật khi nhiệt độ > 35°C",
+    autoCondition: a.actuator_id.startsWith("pump") ? "Bật khi độ ẩm đất < 30%" : "Bật khi nhiệt độ > 35°C",
   }));
 
   if (loading) {
@@ -81,7 +84,7 @@ const Index = () => {
     );
   }
 
-  const noData = sensorCards.length === 0 && deviceList.length === 0 && actuatorData.length === 0 && chartData.length === 0;
+  const noData = readings.length === 0 && deviceList.length === 0 && actuatorData.length === 0 && chartData.length === 0;
 
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -95,13 +98,25 @@ const Index = () => {
         </div>
       )}
 
-      {sensorCards.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          {sensorCards.map((sensor) => (
-            <SensorCard key={sensor.id} sensor={sensor} />
-          ))}
-        </div>
-      )}
+      {readings.map((reading) => {
+        const deviceName = devices.find((d) => d.id === reading.device_id)?.name || reading.device_id;
+        const deviceHistory = history.filter((h) => h.device_id === reading.device_id);
+        const cards = buildSensorCards(reading, deviceHistory);
+
+        return (
+          <div key={reading.device_id} className="mb-6">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-chart-2" />
+              {deviceName}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {cards.map((sensor) => (
+                <SensorCard key={sensor.id} sensor={sensor} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
 
       {actuatorData.length > 0 && (
         <div className="mb-6">

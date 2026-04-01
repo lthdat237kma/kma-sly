@@ -1,14 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zap, ArrowUpDown, Timer, Database } from "lucide-react";
-
-const stats = [
-  { label: "Gói tin/giờ", value: "1,247", icon: ArrowUpDown, color: "text-primary" },
-  { label: "Uptime", value: "99.7%", icon: Timer, color: "text-primary" },
-  { label: "Tần số", value: "868 MHz", icon: Zap, color: "text-warning" },
-  { label: "Dữ liệu", value: "2.4 GB", icon: Database, color: "text-chart-2" },
-];
+import { useDevices } from "@/hooks/useIoTData";
 
 export function NetworkStats() {
+  const devices = useDevices();
+
+  const onlineCount = devices.filter((d) => d.status === "online").length;
+  const totalCount = devices.length;
+  const avgRssi = devices.length > 0
+    ? Math.round(devices.reduce((sum, d) => sum + (d.rssi ?? -120), 0) / devices.length)
+    : -120;
+  const avgBattery = devices.length > 0
+    ? Math.round(devices.reduce((sum, d) => sum + (d.battery ?? 0), 0) / devices.length)
+    : 0;
+
+  const stats = [
+    { label: "Thiết bị online", value: `${onlineCount}/${totalCount}`, icon: ArrowUpDown, color: "text-primary" },
+    { label: "RSSI trung bình", value: `${avgRssi} dBm`, icon: Zap, color: "text-warning" },
+    { label: "Tần số", value: "868 MHz", icon: Timer, color: "text-primary" },
+    { label: "Pin trung bình", value: `${avgBattery}%`, icon: Database, color: "text-chart-2" },
+  ];
+
   return (
     <Card className="border-border/50">
       <CardHeader className="pb-3">
