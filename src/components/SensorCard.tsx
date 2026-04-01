@@ -1,4 +1,14 @@
-import { SensorData } from "@/lib/mockData";
+interface SensorData {
+  id: string;
+  name: string;
+  value: number;
+  unit: string;
+  icon: string;
+  min: number;
+  max: number;
+  status: "normal" | "warning" | "danger";
+  trend: number[];
+}
 import { Card, CardContent } from "@/components/ui/card";
 import { Thermometer, Droplets, Leaf } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
