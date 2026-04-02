@@ -4,6 +4,7 @@ import { HistoryChart } from "@/components/HistoryChart";
 import { NetworkStats } from "@/components/NetworkStats";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { SensorCard } from "@/components/SensorCard";
+import { ConnectionInfo } from "@/components/ConnectionInfo";
 import { useLatestSensorData, useHistoryData, useDevices, useActuators } from "@/hooks/useIoTData";
 import { Loader2, DatabaseZap } from "lucide-react";
 
