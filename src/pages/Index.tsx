@@ -90,6 +90,9 @@ const Index = () => {
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
       <DashboardHeader />
+      <div className="mb-6">
+        <ConnectionInfo />
+      </div>
 
       {noData && (
         <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
