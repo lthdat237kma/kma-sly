@@ -52,6 +52,16 @@ export function DashboardHeader() {
           <Wifi className="w-3.5 h-3.5 text-primary" />
           <span className="text-xs font-medium text-primary">Gateway Online</span>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleDisconnect}
+          disabled={disconnecting}
+          className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-1.5"
+        >
+          {disconnecting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <WifiOff className="w-3.5 h-3.5" />}
+          <span className="text-xs hidden sm:inline">Ngắt kết nối</span>
+        </Button>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary border border-border">
           <Clock className="w-3.5 h-3.5 text-muted-foreground" />
           <span className="text-xs font-mono text-muted-foreground">
