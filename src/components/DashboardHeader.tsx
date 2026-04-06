@@ -15,6 +15,22 @@ export function DashboardHeader() {
     return () => clearInterval(timer);
   }, []);
 
+  const handleDisconnect = async () => {
+    const confirmed = window.confirm("Bạn có chắc muốn ngắt kết nối? Toàn bộ dữ liệu cảm biến, thiết bị và lệnh điều khiển sẽ bị xóa.");
+    if (!confirmed) return;
+
+    setDisconnecting(true);
+    try {
+      await supabase.from("sensor_readings").delete().neq("id", "");
+      await supabase.from("actuator_commands").delete().neq("id", "");
+      await supabase.from("devices").delete().neq("id", "");
+      toast.success("Đã ngắt kết nối và xóa dữ liệu thiết bị");
+    } catch (err) {
+      toast.error("Lỗi khi ngắt kết nối");
+    } finally {
+      setDisconnecting(false);
+    }
+  };
   return (
     <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
       <div>
