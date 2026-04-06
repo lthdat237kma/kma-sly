@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 export function DashboardHeader() {
   const [time, setTime] = useState(new Date());
+  const [disconnecting, setDisconnecting] = useState(false);
   const { user, signOut } = useAuth();
 
   useEffect(() => {
