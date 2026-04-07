@@ -21,9 +21,9 @@ export function DashboardHeader() {
 
     setDisconnecting(true);
     try {
-      await supabase.from("sensor_readings").delete().neq("id", "");
-      await supabase.from("actuator_commands").delete().neq("id", "");
-      await supabase.from("devices").delete().neq("id", "");
+      await supabase.from("sensor_readings").delete().gte("created_at", "1970-01-01");
+      await supabase.from("actuator_commands").delete().gte("updated_at", "1970-01-01");
+      await supabase.from("devices").delete().neq("id", "placeholder-never-match");
       toast.success("Đã ngắt kết nối và xóa dữ liệu thiết bị");
     } catch (err) {
       toast.error("Lỗi khi ngắt kết nối");

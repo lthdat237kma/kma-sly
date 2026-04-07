@@ -95,10 +95,15 @@ const Index = () => {
       </div>
 
       {noData && (
-        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-          <DatabaseZap className="w-12 h-12 mb-4 opacity-50" />
-          <p className="text-lg font-medium">Chưa có dữ liệu</p>
-          <p className="text-sm mt-1">Kết nối thiết bị ESP32/STM32 để bắt đầu nhận dữ liệu cảm biến.</p>
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="p-4 rounded-full bg-primary/10 border border-primary/20 mb-6">
+            <DatabaseZap className="w-12 h-12 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold mb-2">Kết nối với thiết bị</h2>
+          <p className="text-sm text-muted-foreground mb-6 text-center max-w-md">
+            Chưa có thiết bị nào được kết nối. Sử dụng thông tin API bên dưới để kết nối ESP32/STM32 của bạn.
+          </p>
+          <ConnectionInfo defaultExpanded />
         </div>
       )}
 
