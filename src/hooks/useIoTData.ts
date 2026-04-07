@@ -67,8 +67,10 @@ export function useHistoryData() {
   return history;
 }
 
-export function useDevices() {
+export function useDevices(onNewDevice?: () => void) {
   const [devices, setDevices] = useState<Device[]>([]);
+  const onNewDeviceRef = useRef(onNewDevice);
+  onNewDeviceRef.current = onNewDevice;
 
   useEffect(() => {
     const fetch = async () => {
@@ -79,8 +81,11 @@ export function useDevices() {
 
     const channel = supabase
       .channel(`devices-realtime-${crypto.randomUUID()}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "devices" }, () => {
+      .on("postgres_changes", { event: "*", schema: "public", table: "devices" }, (payload) => {
         fetch();
+        if (payload.eventType === "INSERT") {
+          onNewDeviceRef.current?.();
+        }
       })
       .subscribe();
 

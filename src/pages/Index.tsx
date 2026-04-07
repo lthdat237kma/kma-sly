@@ -2,7 +2,6 @@ import { useState, useCallback } from "react";
 import { ActuatorControl } from "@/components/ActuatorControl";
 import { DeviceStatus } from "@/components/DeviceStatus";
 import { HistoryChart } from "@/components/HistoryChart";
-import { NetworkStats } from "@/components/NetworkStats";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { SensorCard } from "@/components/SensorCard";
 import { ConnectionInfo } from "@/components/ConnectionInfo";
