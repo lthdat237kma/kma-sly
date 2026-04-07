@@ -6,19 +6,19 @@ type SensorReading = Tables<"sensor_readings">;
 type ActuatorCommand = Tables<"actuator_commands">;
 type Device = Tables<"devices">;
 
-export function useLatestSensorData() {
+export function useLatestSensorData(onNewData?: () => void) {
   const [readings, setReadings] = useState<SensorReading[]>([]);
   const [loading, setLoading] = useState(true);
+  const onNewDataRef = useRef(onNewData);
+  onNewDataRef.current = onNewData;
 
   useEffect(() => {
     const fetchLatest = async () => {
-      // Get latest reading per device using distinct on device_id
       const { data } = await supabase
         .from("sensor_readings")
         .select("*")
         .order("created_at", { ascending: false });
       if (data) {
-        // Keep only latest per device
         const latestByDevice = new Map<string, SensorReading>();
         for (const r of data) {
           if (!latestByDevice.has(r.device_id)) {
@@ -39,6 +39,7 @@ export function useLatestSensorData() {
           const updated = prev.filter((r) => r.device_id !== newReading.device_id);
           return [...updated, newReading];
         });
+        onNewDataRef.current?.();
       })
       .subscribe();
 

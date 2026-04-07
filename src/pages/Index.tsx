@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { ActuatorControl } from "@/components/ActuatorControl";
 import { DeviceStatus } from "@/components/DeviceStatus";
 import { HistoryChart } from "@/components/HistoryChart";
@@ -6,7 +7,8 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 import { SensorCard } from "@/components/SensorCard";
 import { ConnectionInfo } from "@/components/ConnectionInfo";
 import { useLatestSensorData, useHistoryData, useDevices, useActuators } from "@/hooks/useIoTData";
-import { Loader2, DatabaseZap } from "lucide-react";
+import { Loader2, DatabaseZap, Wifi } from "lucide-react";
+import { toast } from "sonner";
 
 function getSensorStatus(id: string, value: number): "normal" | "warning" | "danger" {
   if (id === "temp" && value > 38) return "danger";
@@ -43,7 +45,19 @@ function buildSensorCards(reading: { device_id: string; temperature: number | nu
 }
 
 const Index = () => {
-  const { readings, loading } = useLatestSensorData();
+  const [disconnected, setDisconnected] = useState(false);
+
+  const handleNewData = useCallback(() => {
+    setDisconnected((prev) => {
+      if (prev) {
+        toast.success("Thiết bị đã kết nối! Đang hiển thị dữ liệu...");
+        return false;
+      }
+      return prev;
+    });
+  }, []);
+
+  const { readings, loading } = useLatestSensorData(handleNewData);
   const history = useHistoryData();
   const devices = useDevices();
   const { actuators, toggleActuator, setMode } = useActuators();
@@ -86,73 +100,94 @@ const Index = () => {
   }
 
   const noData = readings.length === 0 && deviceList.length === 0 && actuatorData.length === 0 && chartData.length === 0;
+  const showDisconnected = disconnected || noData;
 
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-      <DashboardHeader />
-      {!noData && (
-        <div className="mb-6">
-          <ConnectionInfo />
-        </div>
-      )}
+      <DashboardHeader
+        isDisconnected={showDisconnected}
+        onDisconnect={() => setDisconnected(true)}
+      />
 
-      {noData && (
+      {showDisconnected ? (
         <div className="flex flex-col items-center justify-center py-20">
           <div className="p-4 rounded-full bg-primary/10 border border-primary/20 mb-6">
-            <DatabaseZap className="w-12 h-12 text-primary" />
+            {disconnected ? (
+              <Wifi className="w-12 h-12 text-muted-foreground" />
+            ) : (
+              <DatabaseZap className="w-12 h-12 text-primary" />
+            )}
           </div>
-          <h2 className="text-xl font-bold mb-2">Kết nối với thiết bị</h2>
-          <p className="text-sm text-muted-foreground mb-6 text-center max-w-md">
-            Chưa có thiết bị nào được kết nối. Sử dụng thông tin API bên dưới để kết nối ESP32/STM32 của bạn.
-          </p>
-          <ConnectionInfo defaultExpanded />
-        </div>
-      )}
-
-      {readings.map((reading) => {
-        const deviceName = devices.find((d) => d.id === reading.device_id)?.name || reading.device_id;
-        const deviceHistory = history.filter((h) => h.device_id === reading.device_id);
-        const cards = buildSensorCards(reading, deviceHistory);
-
-        return (
-          <div key={reading.device_id} className="mb-6">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-chart-2" />
-              {deviceName}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {cards.map((sensor) => (
-                <SensorCard key={sensor.id} sensor={sensor} />
-              ))}
-            </div>
-          </div>
-        );
-      })}
-
-      {actuatorData.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            Điều khiển thiết bị
+          <h2 className="text-xl font-bold mb-2">
+            {disconnected ? "Đã ngắt kết nối" : "Kết nối với thiết bị"}
           </h2>
-          <ActuatorControl
-            actuators={actuatorData}
-            onToggle={toggleActuator}
-            onModeChange={setMode}
-          />
+          <p className="text-sm text-muted-foreground mb-2 text-center max-w-md">
+            {disconnected
+              ? "Dashboard đang ở chế độ chờ. Khi thiết bị gửi dữ liệu mới, giao diện sẽ tự động chuyển về chế độ giám sát."
+              : "Chưa có thiết bị nào được kết nối. Sử dụng thông tin API bên dưới để kết nối ESP32/STM32 của bạn."}
+          </p>
+          {disconnected && (
+            <p className="text-xs text-muted-foreground mb-4 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-chart-4 animate-pulse" />
+              Đang lắng nghe dữ liệu từ thiết bị...
+            </p>
+          )}
+          <div className="w-full max-w-2xl">
+            <ConnectionInfo defaultExpanded />
+          </div>
         </div>
-      )}
+      ) : (
+        <>
+          <div className="mb-6">
+            <ConnectionInfo />
+          </div>
 
-      {(chartData.length > 0 || deviceList.length > 0) && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2">
-            <HistoryChart data={chartData} />
-          </div>
-          <div className="space-y-4">
-            <DeviceStatus devices={deviceList} />
-            <NetworkStats />
-          </div>
-        </div>
+          {readings.map((reading) => {
+            const deviceName = devices.find((d) => d.id === reading.device_id)?.name || reading.device_id;
+            const deviceHistory = history.filter((h) => h.device_id === reading.device_id);
+            const cards = buildSensorCards(reading, deviceHistory);
+
+            return (
+              <div key={reading.device_id} className="mb-6">
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-chart-2" />
+                  {deviceName}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {cards.map((sensor) => (
+                    <SensorCard key={sensor.id} sensor={sensor} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {actuatorData.length > 0 && (
+            <div className="mb-6">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                Điều khiển thiết bị
+              </h2>
+              <ActuatorControl
+                actuators={actuatorData}
+                onToggle={toggleActuator}
+                onModeChange={setMode}
+              />
+            </div>
+          )}
+
+          {(chartData.length > 0 || deviceList.length > 0) && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="lg:col-span-2">
+                <HistoryChart data={chartData} />
+              </div>
+              <div className="space-y-4">
+                <DeviceStatus devices={deviceList} />
+                <NetworkStats />
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
