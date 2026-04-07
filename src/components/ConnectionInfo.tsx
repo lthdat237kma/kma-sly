@@ -53,8 +53,8 @@ void sendData(float temp, float hum, float soil) {
   http.end();
 }`;
 
-export function ConnectionInfo() {
-  const [expanded, setExpanded] = useState(false);
+export function ConnectionInfo({ defaultExpanded = false }: { defaultExpanded?: boolean }) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   const curlExample = `curl -X POST "${ENDPOINT_URL}" \\
   -H "Content-Type: application/json" \\
