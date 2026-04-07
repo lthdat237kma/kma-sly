@@ -58,7 +58,7 @@ const Index = () => {
 
   const { readings, loading } = useLatestSensorData(handleNewData);
   const history = useHistoryData();
-  const devices = useDevices();
+  const devices = useDevices(handleNewData);
   const { actuators, toggleActuator, setMode } = useActuators();
 
   const chartData = history.map((r) => ({
@@ -176,13 +176,12 @@ const Index = () => {
           )}
 
           {(chartData.length > 0 || deviceList.length > 0) && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
                 <HistoryChart data={chartData} />
               </div>
-              <div className="space-y-4">
+              <div>
                 <DeviceStatus devices={deviceList} />
-                <NetworkStats />
               </div>
             </div>
           )}
