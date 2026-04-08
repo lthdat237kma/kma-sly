@@ -98,7 +98,7 @@ const Index = () => {
     );
   }
 
-  const noData = readings.length === 0 && deviceList.length === 0 && actuatorData.length === 0 && chartData.length === 0;
+  const noData = readings.length === 0 && deviceList.length === 0 && actuatorData.length === 0 && history.length === 0;
   const showDisconnected = disconnected || noData;
 
   return (
