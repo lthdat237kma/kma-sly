@@ -167,8 +167,6 @@ const Index = () => {
             ))}
           </div>
 
-          {/* Auto-select first node */}
-          {deviceList.length > 0 && !selectedNode && (() => { setTimeout(() => setSelectedNode(deviceList[0].id), 0); return null; })()}
 
           {/* Selected node data */}
           {selectedNode && (() => {
