@@ -45,6 +45,7 @@ function buildSensorCards(reading: { device_id: string; temperature: number | nu
 
 const Index = () => {
   const [disconnected, setDisconnected] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
   const handleNewData = useCallback(() => {
     setDisconnected((prev) => {
