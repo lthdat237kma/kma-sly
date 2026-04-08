@@ -142,50 +142,84 @@ const Index = () => {
             <ConnectionInfo />
           </div>
 
-          {readings.map((reading) => {
-            const deviceName = devices.find((d) => d.id === reading.device_id)?.name || reading.device_id;
-            const deviceHistory = history.filter((h) => h.device_id === reading.device_id);
-            const cards = buildSensorCards(reading, deviceHistory);
+          {/* Node selector */}
+          <div className="flex gap-3 mb-6">
+            {deviceList.map((device) => (
+              <button
+                key={device.id}
+                onClick={() => setSelectedNode(device.id)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-medium transition-all ${
+                  selectedNode === device.id
+                    ? "bg-primary text-primary-foreground border-primary shadow-md"
+                    : "bg-secondary text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground"
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${device.status === "online" ? "bg-chart-2" : "bg-muted-foreground"}`} />
+                {device.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Auto-select first node */}
+          {deviceList.length > 0 && !selectedNode && (() => { setSelectedNode(deviceList[0].id); return null; })()}
+
+          {/* Selected node data */}
+          {selectedNode && (() => {
+            const reading = readings.find((r) => r.device_id === selectedNode);
+            const deviceHistory = history.filter((h) => h.device_id === selectedNode);
+            const deviceName = devices.find((d) => d.id === selectedNode)?.name || selectedNode;
+            const nodeActuators = actuatorData.filter((a) => {
+              if (selectedNode === deviceList[0]?.id) return !a.id.endsWith("2");
+              if (selectedNode === deviceList[1]?.id) return a.id.endsWith("2");
+              return false;
+            });
+
+            const cards = reading ? buildSensorCards(reading, deviceHistory) : [];
+            const nodeChartData = deviceHistory.map((r) => ({
+              time: new Date(r.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+              temperature: r.temperature ?? 0,
+              humidity: r.humidity ?? 0,
+              soilMoisture: r.soil_moisture ?? 0,
+            }));
 
             return (
-              <div key={reading.device_id} className="mb-6">
+              <div>
                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-chart-2" />
                   {deviceName}
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {cards.map((sensor) => (
-                    <SensorCard key={sensor.id} sensor={sensor} />
-                  ))}
-                </div>
+
+                {cards.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    {cards.map((sensor) => (
+                      <SensorCard key={sensor.id} sensor={sensor} />
+                    ))}
+                  </div>
+                )}
+
+                {nodeActuators.length > 0 && (
+                  <div className="mb-6">
+                    <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      Điều khiển thiết bị
+                    </h2>
+                    <ActuatorControl
+                      actuators={nodeActuators}
+                      onToggle={toggleActuator}
+                      onModeChange={setMode}
+                    />
+                  </div>
+                )}
+
+                {nodeChartData.length > 0 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <HistoryChart data={nodeChartData} />
+                    <DeviceStatus devices={deviceList.filter((d) => d.id === selectedNode)} />
+                  </div>
+                )}
               </div>
             );
-          })}
-
-          {actuatorData.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                Điều khiển thiết bị
-              </h2>
-              <ActuatorControl
-                actuators={actuatorData}
-                onToggle={toggleActuator}
-                onModeChange={setMode}
-              />
-            </div>
-          )}
-
-          {(chartData.length > 0 || deviceList.length > 0) && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div>
-                <HistoryChart data={chartData} />
-              </div>
-              <div>
-                <DeviceStatus devices={deviceList} />
-              </div>
-            </div>
-          )}
+          })()}
         </>
       )}
     </div>
