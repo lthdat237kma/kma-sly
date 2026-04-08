@@ -62,6 +62,12 @@ const Index = () => {
   const devices = useDevices(handleNewData);
   const { actuators, toggleActuator, setMode } = useActuators();
 
+  // Auto-select first node
+  useEffect(() => {
+    if (deviceList.length > 0 && !selectedNode) {
+      setSelectedNode(deviceList[0].id);
+    }
+  }, [deviceList, selectedNode]);
   const chartData = history.map((r) => ({
     time: new Date(r.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
     temperature: r.temperature ?? 0,
