@@ -61,14 +61,6 @@ const Index = () => {
   const history = useHistoryData();
   const devices = useDevices(handleNewData);
   const { actuators, toggleActuator, setMode } = useActuators();
-
-  const chartData = history.map((r) => ({
-    time: new Date(r.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-    temperature: r.temperature ?? 0,
-    humidity: r.humidity ?? 0,
-    soilMoisture: r.soil_moisture ?? 0,
-  }));
-
   const deviceList = devices.map((d) => ({
     id: d.id, name: d.name, location: d.location || "",
     status: d.status as "online" | "offline" | "warning",
