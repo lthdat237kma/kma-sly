@@ -164,7 +164,8 @@ const Index = () => {
           {selectedNode && (() => {
             const reading = readings.find((r) => r.device_id === selectedNode);
             const deviceHistory = history.filter((h) => h.device_id === selectedNode);
-            const deviceName = devices.find((d) => d.id === selectedNode)?.name || selectedNode;
+            const nodeIndex = deviceList.findIndex((d) => d.id === selectedNode);
+            const deviceName = `Node ${nodeIndex + 1}`;
             const nodeActuators = actuatorData.filter((a) => {
               if (selectedNode === deviceList[0]?.id) return !a.id.endsWith("2");
               if (selectedNode === deviceList[1]?.id) return a.id.endsWith("2");
