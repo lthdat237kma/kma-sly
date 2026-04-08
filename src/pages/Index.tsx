@@ -143,7 +143,7 @@ const Index = () => {
 
           {/* Node selector */}
           <div className="flex gap-3 mb-6">
-            {deviceList.map((device) => (
+            {deviceList.map((device, index) => (
               <button
                 key={device.id}
                 onClick={() => setSelectedNode(device.id)}
@@ -154,7 +154,7 @@ const Index = () => {
                 }`}
               >
                 <span className={`w-2 h-2 rounded-full ${device.status === "online" ? "bg-chart-2" : "bg-muted-foreground"}`} />
-                {device.name}
+                Node {index + 1}
               </button>
             ))}
           </div>
