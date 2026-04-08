@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ActuatorControl } from "@/components/ActuatorControl";
 import { DeviceStatus } from "@/components/DeviceStatus";
 import { HistoryChart } from "@/components/HistoryChart";
