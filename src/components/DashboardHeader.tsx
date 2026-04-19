@@ -43,9 +43,6 @@ export function DashboardHeader({ isDisconnected, onDisconnect }: DashboardHeade
             LoRa<span className="text-primary">WAN</span> Dashboard
           </h1>
         </div>
-        <p className="text-sm text-muted-foreground ml-12">
-          Hệ thống giám sát cảm biến IoT thời gian thực
-        </p>
       </div>
 
       <div className="flex items-center gap-4">
