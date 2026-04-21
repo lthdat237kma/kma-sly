@@ -95,8 +95,33 @@ Deno.serve(async (req) => {
         servo2: get("servo2")?.is_on ? 1 : 0,
       };
 
+      const getMode = (id: string) => get(id)?.mode ?? "manual";
+      const { data: thresholds } = await supabase
+        .from("node_thresholds")
+        .select("node_id, temp_max, soil_min, rain_max");
+
+      const node1Id = `${device_id}-node1`;
+      const node2Id = `${device_id}-node2`;
+      const t1 = thresholds?.find((t) => t.node_id === node1Id);
+      const t2 = thresholds?.find((t) => t.node_id === node2Id);
+
+      const nodesResponse = {
+        node1: {
+          fan: { on: get("fan")?.is_on ? 1 : 0, mode: getMode("fan") },
+          pump: { on: get("pump")?.is_on ? 1 : 0, mode: getMode("pump") },
+          servo: { on: get("servo")?.is_on ? 1 : 0, mode: getMode("servo") },
+          thresholds: { temp_max: t1?.temp_max ?? 35, soil_min: t1?.soil_min ?? 30, rain_max: t1?.rain_max ?? 50 },
+        },
+        node2: {
+          fan: { on: get("fan2")?.is_on ? 1 : 0, mode: getMode("fan2") },
+          pump: { on: get("pump2")?.is_on ? 1 : 0, mode: getMode("pump2") },
+          servo: { on: get("servo2")?.is_on ? 1 : 0, mode: getMode("servo2") },
+          thresholds: { temp_max: t2?.temp_max ?? 35, soil_min: t2?.soil_min ?? 30, rain_max: t2?.rain_max ?? 50 },
+        },
+      };
+
       return new Response(
-        JSON.stringify({ success: true, commands: responseCommands, raw: commands || [] }),
+        JSON.stringify({ success: true, commands: responseCommands, nodes: nodesResponse, raw: commands || [] }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -107,8 +132,12 @@ Deno.serve(async (req) => {
         .from("actuator_commands")
         .select("actuator_id, is_on, mode");
 
+      const { data: thresholds } = await supabase
+        .from("node_thresholds")
+        .select("node_id, temp_max, soil_min, rain_max");
+
       return new Response(
-        JSON.stringify({ commands: commands || [] }),
+        JSON.stringify({ commands: commands || [], thresholds: thresholds || [] }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
