@@ -83,19 +83,20 @@ const Index = () => {
     id: a.actuator_id,
     name: a.actuator_id === "pump" ? "Máy bơm nước (Node 1)"
       : a.actuator_id === "pump2" ? "Máy bơm nước (Node 2)"
-      : a.actuator_id === "servo" ? "Servo Motor (Node 1)"
-      : a.actuator_id === "servo2" ? "Servo Motor (Node 2)"
+      : a.actuator_id === "servo" ? "Mái che (Node 1)"
+      : a.actuator_id === "servo2" ? "Mái che (Node 2)"
       : a.actuator_id === "fan" ? "Quạt (Node 1)"
       : a.actuator_id === "fan2" ? "Quạt (Node 2)"
       : a.actuator_id,
     icon: a.actuator_id.startsWith("pump") ? "Waves"
       : a.actuator_id.startsWith("fan") ? "Fan"
+      : a.actuator_id.startsWith("servo") ? "Umbrella"
       : "Settings",
     isOn: a.is_on,
     mode: a.mode as "manual" | "auto",
     autoCondition: a.actuator_id.startsWith("pump") ? "Bật khi độ ẩm đất < ngưỡng"
       : a.actuator_id.startsWith("fan") ? "Bật khi nhiệt độ > ngưỡng"
-      : "Đóng khi lượng mưa > ngưỡng",
+      : "Đóng mái khi lượng mưa > ngưỡng",
   }));
 
   if (loading) {
