@@ -43,8 +43,8 @@ function buildSensorCards(reading: { device_id: string; temperature: number | nu
       trend: history.slice(-8).map((h) => h.soil_moisture ?? 0),
     },
     {
-      id: `rain-${reading.device_id}`, name: "Mức nước mưa",
-      value: reading.rain_level ?? 0, unit: "%", icon: "CloudRain",
+      id: `rain-${reading.device_id}`, name: "Lượng mưa",
+      value: reading.rain_level ?? 0, unit: "mm", icon: "CloudRain",
       min: 0, max: 100,
       status: getSensorStatus("rain", reading.rain_level ?? 0),
       trend: history.slice(-8).map((h) => h.rain_level ?? 0),
