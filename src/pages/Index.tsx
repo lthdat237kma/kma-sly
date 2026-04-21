@@ -14,10 +14,12 @@ function getSensorStatus(id: string, value: number): "normal" | "warning" | "dan
   if (id === "temp" && value > 33) return "warning";
   if (id === "soil" && value < 25) return "danger";
   if (id === "soil" && value < 35) return "warning";
+  if (id === "rain" && value > 75) return "danger";
+  if (id === "rain" && value > 50) return "warning";
   return "normal";
 }
 
-function buildSensorCards(reading: { device_id: string; temperature: number | null; humidity: number | null; soil_moisture: number | null }, history: { temperature: number | null; humidity: number | null; soil_moisture: number | null }[]) {
+function buildSensorCards(reading: { device_id: string; temperature: number | null; humidity: number | null; soil_moisture: number | null; rain_level: number | null }, history: { temperature: number | null; humidity: number | null; soil_moisture: number | null; rain_level: number | null }[]) {
   return [
     {
       id: `temp-${reading.device_id}`, name: "Nhiệt độ (DHT11)",
@@ -39,6 +41,13 @@ function buildSensorCards(reading: { device_id: string; temperature: number | nu
       min: 0, max: 100,
       status: getSensorStatus("soil", reading.soil_moisture ?? 0),
       trend: history.slice(-8).map((h) => h.soil_moisture ?? 0),
+    },
+    {
+      id: `rain-${reading.device_id}`, name: "Mức nước mưa",
+      value: reading.rain_level ?? 0, unit: "%", icon: "CloudRain",
+      min: 0, max: 100,
+      status: getSensorStatus("rain", reading.rain_level ?? 0),
+      trend: history.slice(-8).map((h) => h.rain_level ?? 0),
     },
   ];
 }
