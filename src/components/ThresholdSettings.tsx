@@ -44,8 +44,13 @@ export function ThresholdSettings({ nodeId, nodeLabel }: Props) {
       .from("node_thresholds")
       .upsert({ node_id: nodeId, ...values, updated_at: new Date().toISOString() }, { onConflict: "node_id" });
     setSaving(false);
-    if (error) toast.error("Lỗi khi lưu ngưỡng");
-    else toast.success(`Đã lưu ngưỡng cho ${nodeLabel}`);
+    if (error) {
+      toast.error("Lỗi khi lưu ngưỡng");
+      return;
+    }
+    toast.success(`Đã gửi ngưỡng mới cho ${nodeLabel}`, {
+      description: `ESP nhận ở lần polling kế tiếp · T≤${values.temp_max}°C · Soil≥${values.soil_min}% · Rain≤${values.rain_max}mm`,
+    });
   };
 
   const fields = [
