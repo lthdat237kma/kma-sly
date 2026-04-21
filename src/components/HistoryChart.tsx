@@ -1,8 +1,8 @@
 interface HistoryPoint {
   time: string;
   temperature: number;
-  humidity: number;
   soilMoisture: number;
+  rainLevel: number;
 }
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -19,8 +19,8 @@ import { Activity } from "lucide-react";
 
 const chartLines = [
   { key: "temperature", name: "Nhiệt độ (°C)", color: "hsl(162, 100%, 42%)" },
-  { key: "humidity", name: "Độ ẩm KK (%)", color: "hsl(200, 80%, 55%)" },
   { key: "soilMoisture", name: "Độ ẩm đất (%)", color: "hsl(32, 95%, 55%)" },
+  { key: "rainLevel", name: "Lượng mưa (mm)", color: "hsl(200, 80%, 55%)" },
 ];
 
 export function HistoryChart({ data }: { data: HistoryPoint[] }) {

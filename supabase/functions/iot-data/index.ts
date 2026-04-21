@@ -20,8 +20,10 @@ Deno.serve(async (req) => {
     if (req.method === "POST") {
       const body = await req.json();
 
-      // Validate required fields
-      const { device_id, temperature, humidity, soil_moisture, rain_level, device_name, device_location, mcu, rssi, snr, battery, spreading_factor } = body;
+      // Two payload formats supported:
+      // A) Multi-node: { device_id, node1:{temp,soil,rain,fan,pump,servo}, node2:{...} }
+      // B) Legacy single-node: { device_id, temperature, soil_moisture, rain_level, ... }
+      const { device_id, node1, node2, device_location, mcu, rssi, snr, battery, spreading_factor } = body;
 
       if (!device_id) {
         return new Response(
@@ -30,28 +32,42 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Insert sensor reading
-      const { error: sensorError } = await supabase
-        .from("sensor_readings")
-        .insert({
-          device_id,
-          temperature: temperature ?? null,
-          humidity: humidity ?? null,
-          soil_moisture: soil_moisture ?? null,
-          rain_level: rain_level ?? null,
-        });
+      const nodes: { id: string; name: string; sensors: { temperature: number | null; soil_moisture: number | null; rain_level: number | null } }[] = [];
 
-      if (sensorError) {
-        throw new Error(`Failed to insert sensor reading: ${sensorError.message}`);
+      if (node1 || node2) {
+        if (node1) nodes.push({
+          id: `${device_id}-node1`,
+          name: "Node 1",
+          sensors: { temperature: node1.temp ?? null, soil_moisture: node1.soil ?? null, rain_level: node1.rain ?? null },
+        });
+        if (node2) nodes.push({
+          id: `${device_id}-node2`,
+          name: "Node 2",
+          sensors: { temperature: node2.temp ?? null, soil_moisture: node2.soil ?? null, rain_level: node2.rain ?? null },
+        });
+      } else {
+        nodes.push({
+          id: device_id,
+          name: body.device_name || device_id,
+          sensors: {
+            temperature: body.temperature ?? null,
+            soil_moisture: body.soil_moisture ?? null,
+            rain_level: body.rain_level ?? null,
+          },
+        });
       }
 
-      // Upsert device status
-      const { error: deviceError } = await supabase
-        .from("devices")
-        .upsert(
-          {
-            id: device_id,
-            name: device_name || device_id,
+      for (const n of nodes) {
+        const { error: sensorError } = await supabase
+          .from("sensor_readings")
+          .insert({ device_id: n.id, ...n.sensors });
+        if (sensorError) throw new Error(`Insert sensor failed (${n.id}): ${sensorError.message}`);
+
+        const { error: deviceError } = await supabase
+          .from("devices")
+          .upsert({
+            id: n.id,
+            name: n.name,
             location: device_location || null,
             status: "online",
             mcu: mcu || "ESP32",
@@ -60,24 +76,27 @@ Deno.serve(async (req) => {
             battery: battery ?? 100,
             spreading_factor: spreading_factor ?? 7,
             last_seen: new Date().toISOString(),
-          },
-          { onConflict: "id" }
-        );
-
-      if (deviceError) {
-        throw new Error(`Failed to upsert device: ${deviceError.message}`);
+          }, { onConflict: "id" });
+        if (deviceError) throw new Error(`Upsert device failed (${n.id}): ${deviceError.message}`);
       }
 
-      // Return current actuator commands so ESP32 can act on them
+      // Build firmware-friendly commands payload
       const { data: commands } = await supabase
         .from("actuator_commands")
         .select("actuator_id, is_on, mode");
 
+      const get = (id: string) => commands?.find((c) => c.actuator_id === id);
+      const responseCommands = {
+        fan: get("fan")?.is_on ? 1 : 0,
+        pump: get("pump")?.is_on ? 1 : 0,
+        servo: get("servo")?.is_on ? 1 : 0,
+        fan2: get("fan2")?.is_on ? 1 : 0,
+        pump2: get("pump2")?.is_on ? 1 : 0,
+        servo2: get("servo2")?.is_on ? 1 : 0,
+      };
+
       return new Response(
-        JSON.stringify({
-          success: true,
-          commands: commands || [],
-        }),
+        JSON.stringify({ success: true, commands: responseCommands, raw: commands || [] }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

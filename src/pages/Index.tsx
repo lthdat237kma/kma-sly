@@ -19,7 +19,7 @@ function getSensorStatus(id: string, value: number): "normal" | "warning" | "dan
   return "normal";
 }
 
-function buildSensorCards(reading: { device_id: string; temperature: number | null; humidity: number | null; soil_moisture: number | null; rain_level: number | null }, history: { temperature: number | null; humidity: number | null; soil_moisture: number | null; rain_level: number | null }[]) {
+function buildSensorCards(reading: { device_id: string; temperature: number | null; soil_moisture: number | null; rain_level: number | null }, history: { temperature: number | null; soil_moisture: number | null; rain_level: number | null }[]) {
   return [
     {
       id: `temp-${reading.device_id}`, name: "Nhiệt độ (DHT11)",
@@ -27,13 +27,6 @@ function buildSensorCards(reading: { device_id: string; temperature: number | nu
       min: 0, max: 50,
       status: getSensorStatus("temp", reading.temperature ?? 0),
       trend: history.slice(-8).map((h) => h.temperature ?? 0),
-    },
-    {
-      id: `humidity-${reading.device_id}`, name: "Độ ẩm KK (DHT11)",
-      value: reading.humidity ?? 0, unit: "%", icon: "Droplets",
-      min: 20, max: 90,
-      status: "normal" as const,
-      trend: history.slice(-8).map((h) => h.humidity ?? 0),
     },
     {
       id: `soil-${reading.device_id}`, name: "Độ ẩm đất",
@@ -92,11 +85,17 @@ const Index = () => {
       : a.actuator_id === "pump2" ? "Máy bơm nước (Node 2)"
       : a.actuator_id === "servo" ? "Servo Motor (Node 1)"
       : a.actuator_id === "servo2" ? "Servo Motor (Node 2)"
+      : a.actuator_id === "fan" ? "Quạt (Node 1)"
+      : a.actuator_id === "fan2" ? "Quạt (Node 2)"
       : a.actuator_id,
-    icon: a.actuator_id.startsWith("pump") ? "Waves" : "Settings",
+    icon: a.actuator_id.startsWith("pump") ? "Waves"
+      : a.actuator_id.startsWith("fan") ? "Fan"
+      : "Settings",
     isOn: a.is_on,
     mode: a.mode as "manual" | "auto",
-    autoCondition: a.actuator_id.startsWith("pump") ? "Bật khi độ ẩm đất < 30%" : "Bật khi nhiệt độ > 35°C",
+    autoCondition: a.actuator_id.startsWith("pump") ? "Bật khi độ ẩm đất < ngưỡng"
+      : a.actuator_id.startsWith("fan") ? "Bật khi nhiệt độ > ngưỡng"
+      : "Đóng khi lượng mưa > ngưỡng",
   }));
 
   if (loading) {
@@ -185,8 +184,8 @@ const Index = () => {
             const nodeChartData = deviceHistory.map((r) => ({
               time: new Date(r.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
               temperature: r.temperature ?? 0,
-              humidity: r.humidity ?? 0,
               soilMoisture: r.soil_moisture ?? 0,
+              rainLevel: r.rain_level ?? 0,
             }));
 
             return (
