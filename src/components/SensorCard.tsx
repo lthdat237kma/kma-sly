@@ -1,7 +1,7 @@
 interface SensorData {
   id: string;
   name: string;
-  value: number;
+  value: number | null;
   unit: string;
   icon: string;
   min: number;
@@ -35,7 +35,8 @@ const chartColor = {
 export function SensorCard({ sensor }: { sensor: SensorData }) {
   const Icon = iconMap[sensor.icon] || Thermometer;
   const trendData = sensor.trend.map((v, i) => ({ i, v }));
-  const percentage = ((sensor.value - sensor.min) / (sensor.max - sensor.min)) * 100;
+  const isNull = sensor.value === null;
+  const percentage = isNull ? 0 : ((sensor.value - sensor.min) / (sensor.max - sensor.min)) * 100;
 
   return (
     <Card className="relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300">
@@ -69,10 +70,16 @@ export function SensorCard({ sensor }: { sensor: SensorData }) {
         </div>
 
         <div className="flex items-baseline gap-1 mb-3">
-          <span className={`sensor-value ${statusColor[sensor.status]}`}>
-            {sensor.value.toLocaleString("vi-VN", { maximumFractionDigits: 1 })}
-          </span>
-          <span className="sensor-unit">{sensor.unit}</span>
+          {isNull ? (
+            <span className="sensor-value text-muted-foreground/60 font-mono">NULL</span>
+          ) : (
+            <>
+              <span className={`sensor-value ${statusColor[sensor.status]}`}>
+                {sensor.value.toLocaleString("vi-VN", { maximumFractionDigits: 1 })}
+              </span>
+              <span className="sensor-unit">{sensor.unit}</span>
+            </>
+          )}
         </div>
 
         <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
