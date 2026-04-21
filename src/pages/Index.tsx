@@ -175,11 +175,14 @@ const Index = () => {
             const deviceHistory = history.filter((h) => h.device_id === selectedNode);
             const nodeIndex = deviceList.findIndex((d) => d.id === selectedNode);
             const deviceName = `Node ${nodeIndex + 1}`;
-            const nodeActuators = actuatorData.filter((a) => {
-              if (selectedNode === deviceList[0]?.id) return !a.id.endsWith("2");
-              if (selectedNode === deviceList[1]?.id) return a.id.endsWith("2");
-              return false;
-            });
+            const order = ["fan", "servo", "pump", "fan2", "servo2", "pump2"];
+            const nodeActuators = actuatorData
+              .filter((a) => {
+                if (selectedNode === deviceList[0]?.id) return !a.id.endsWith("2");
+                if (selectedNode === deviceList[1]?.id) return a.id.endsWith("2");
+                return false;
+              })
+              .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
 
             const cards = reading ? buildSensorCards(reading, deviceHistory) : [];
             const nodeChartData = deviceHistory.map((r) => ({
