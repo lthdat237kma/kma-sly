@@ -24,21 +24,21 @@ function buildSensorCards(reading: { device_id: string; temperature: number | nu
   return [
     {
       id: `temp-${reading.device_id}`, name: "Nhiệt độ (DHT11)",
-      value: reading.temperature ?? 0, unit: "°C", icon: "Thermometer",
+      value: reading.temperature, unit: "°C", icon: "Thermometer",
       min: 0, max: 50,
       status: getSensorStatus("temp", reading.temperature ?? 0),
       trend: history.slice(-8).map((h) => h.temperature ?? 0),
     },
     {
       id: `soil-${reading.device_id}`, name: "Độ ẩm đất",
-      value: reading.soil_moisture ?? 0, unit: "%", icon: "Leaf",
+      value: reading.soil_moisture, unit: "%", icon: "Leaf",
       min: 0, max: 100,
       status: getSensorStatus("soil", reading.soil_moisture ?? 0),
       trend: history.slice(-8).map((h) => h.soil_moisture ?? 0),
     },
     {
       id: `rain-${reading.device_id}`, name: "Lượng mưa",
-      value: reading.rain_level ?? 0, unit: "mm", icon: "CloudRain",
+      value: reading.rain_level, unit: "mm", icon: "CloudRain",
       min: 0, max: 100,
       status: getSensorStatus("rain", reading.rain_level ?? 0),
       trend: history.slice(-8).map((h) => h.rain_level ?? 0),
