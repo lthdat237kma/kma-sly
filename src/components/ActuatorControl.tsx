@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Waves, Settings, ToggleLeft, Fan, Umbrella } from "lucide-react";
+import { Waves, Settings, ToggleLeft, Fan, Umbrella, Flame } from "lucide-react";
 import { toast } from "sonner";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -10,6 +10,7 @@ const iconMap: Record<string, React.ElementType> = {
   Settings,
   Fan,
   Umbrella,
+  Flame,
 };
 
 interface ActuatorItem {
