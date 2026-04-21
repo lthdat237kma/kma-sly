@@ -81,7 +81,6 @@ export type Database = {
         Row: {
           created_at: string
           device_id: string
-          humidity: number | null
           id: string
           rain_level: number | null
           soil_moisture: number | null
@@ -90,7 +89,6 @@ export type Database = {
         Insert: {
           created_at?: string
           device_id: string
-          humidity?: number | null
           id?: string
           rain_level?: number | null
           soil_moisture?: number | null
@@ -99,7 +97,6 @@ export type Database = {
         Update: {
           created_at?: string
           device_id?: string
-          humidity?: number | null
           id?: string
           rain_level?: number | null
           soil_moisture?: number | null
