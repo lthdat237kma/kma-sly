@@ -77,6 +77,33 @@ export type Database = {
         }
         Relationships: []
       }
+      node_thresholds: {
+        Row: {
+          id: string
+          node_id: string
+          rain_max: number
+          soil_min: number
+          temp_max: number
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          node_id: string
+          rain_max?: number
+          soil_min?: number
+          temp_max?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          node_id?: string
+          rain_max?: number
+          soil_min?: number
+          temp_max?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sensor_readings: {
         Row: {
           created_at: string
