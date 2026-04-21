@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Waves, Settings, ToggleLeft } from "lucide-react";
+import { Waves, Settings, ToggleLeft, Fan } from "lucide-react";
 import { toast } from "sonner";
 
 const iconMap: Record<string, React.ElementType> = {
   Waves,
   Settings,
+  Fan,
 };
 
 interface ActuatorItem {
