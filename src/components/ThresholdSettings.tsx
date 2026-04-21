@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Thermometer, Leaf, CloudRain, Save } from "lucide-react";
+import { Thermometer, ThermometerSnowflake, Leaf, CloudRain, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -13,12 +13,13 @@ interface Props {
 
 interface Thresholds {
   temp_max: number;
+  temp_min: number;
   soil_min: number;
   rain_max: number;
 }
 
 export function ThresholdSettings({ nodeId, nodeLabel }: Props) {
-  const [values, setValues] = useState<Thresholds>({ temp_max: 35, soil_min: 30, rain_max: 50 });
+  const [values, setValues] = useState<Thresholds>({ temp_max: 35, temp_min: 15, soil_min: 30, rain_max: 50 });
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -27,12 +28,17 @@ export function ThresholdSettings({ nodeId, nodeLabel }: Props) {
     setLoading(true);
     supabase
       .from("node_thresholds")
-      .select("temp_max, soil_min, rain_max")
+      .select("temp_max, temp_min, soil_min, rain_max")
       .eq("node_id", nodeId)
       .maybeSingle()
       .then(({ data }) => {
         if (!active) return;
-        if (data) setValues({ temp_max: data.temp_max, soil_min: data.soil_min, rain_max: data.rain_max });
+        if (data) setValues({
+          temp_max: data.temp_max,
+          temp_min: (data as { temp_min?: number }).temp_min ?? 15,
+          soil_min: data.soil_min,
+          rain_max: data.rain_max,
+        });
         setLoading(false);
       });
     return () => { active = false; };
@@ -49,11 +55,12 @@ export function ThresholdSettings({ nodeId, nodeLabel }: Props) {
       return;
     }
     toast.success(`Đã gửi ngưỡng mới cho ${nodeLabel}`, {
-      description: `ESP nhận ở lần polling kế tiếp · T≤${values.temp_max}°C · Soil≥${values.soil_min}% · Rain≤${values.rain_max}mm`,
+      description: `ESP nhận ở lần polling kế tiếp · ${values.temp_min}°C ≤ T ≤ ${values.temp_max}°C · Soil≥${values.soil_min}% · Rain≤${values.rain_max}mm`,
     });
   };
 
   const fields = [
+    { key: "temp_min" as const, label: "Nhiệt độ tối thiểu", unit: "°C", icon: ThermometerSnowflake, hint: "Đèn sưởi bật khi nhiệt độ thấp hơn ngưỡng" },
     { key: "temp_max" as const, label: "Nhiệt độ tối đa", unit: "°C", icon: Thermometer, hint: "Quạt bật khi nhiệt độ vượt ngưỡng" },
     { key: "soil_min" as const, label: "Độ ẩm đất tối thiểu", unit: "%", icon: Leaf, hint: "Bơm bật khi độ ẩm thấp hơn ngưỡng" },
     { key: "rain_max" as const, label: "Lượng mưa tối đa", unit: "mm", icon: CloudRain, hint: "Mái che đóng khi mưa vượt ngưỡng" },
@@ -62,7 +69,7 @@ export function ThresholdSettings({ nodeId, nodeLabel }: Props) {
   return (
     <Card className="border-border/50">
       <CardContent className="p-5">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           {fields.map(({ key, label, unit, icon: Icon, hint }) => (
             <div key={key} className="space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium">

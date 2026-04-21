@@ -84,6 +84,7 @@ export type Database = {
           rain_max: number
           soil_min: number
           temp_max: number
+          temp_min: number
           updated_at: string
         }
         Insert: {
@@ -92,6 +93,7 @@ export type Database = {
           rain_max?: number
           soil_min?: number
           temp_max?: number
+          temp_min?: number
           updated_at?: string
         }
         Update: {
@@ -100,6 +102,7 @@ export type Database = {
           rain_max?: number
           soil_min?: number
           temp_max?: number
+          temp_min?: number
           updated_at?: string
         }
         Relationships: []

@@ -88,15 +88,19 @@ const Index = () => {
       : a.actuator_id === "servo2" ? "Mái che (Node 2)"
       : a.actuator_id === "fan" ? "Quạt (Node 1)"
       : a.actuator_id === "fan2" ? "Quạt (Node 2)"
+      : a.actuator_id === "heater" ? "Đèn sưởi (Node 1)"
+      : a.actuator_id === "heater2" ? "Đèn sưởi (Node 2)"
       : a.actuator_id,
     icon: a.actuator_id.startsWith("pump") ? "Waves"
       : a.actuator_id.startsWith("fan") ? "Fan"
       : a.actuator_id.startsWith("servo") ? "Umbrella"
+      : a.actuator_id.startsWith("heater") ? "Flame"
       : "Settings",
     isOn: a.is_on,
     mode: a.mode as "manual" | "auto",
     autoCondition: a.actuator_id.startsWith("pump") ? "Bật khi độ ẩm đất < ngưỡng"
       : a.actuator_id.startsWith("fan") ? "Bật khi nhiệt độ > ngưỡng"
+      : a.actuator_id.startsWith("heater") ? "Bật khi nhiệt độ < ngưỡng tối thiểu"
       : "Đóng mái khi lượng mưa > ngưỡng",
   }));
 
@@ -176,7 +180,7 @@ const Index = () => {
             const deviceHistory = history.filter((h) => h.device_id === selectedNode);
             const nodeIndex = deviceList.findIndex((d) => d.id === selectedNode);
             const deviceName = `Node ${nodeIndex + 1}`;
-            const order = ["fan", "servo", "pump", "fan2", "servo2", "pump2"];
+            const order = ["fan", "heater", "servo", "pump", "fan2", "heater2", "servo2", "pump2"];
             const nodeActuators = actuatorData
               .filter((a) => {
                 if (selectedNode === deviceList[0]?.id) return !a.id.endsWith("2");

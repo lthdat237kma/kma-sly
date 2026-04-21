@@ -90,15 +90,17 @@ Deno.serve(async (req) => {
         fan: get("fan")?.is_on ? 1 : 0,
         pump: get("pump")?.is_on ? 1 : 0,
         servo: get("servo")?.is_on ? 1 : 0,
+        heater: get("heater")?.is_on ? 1 : 0,
         fan2: get("fan2")?.is_on ? 1 : 0,
         pump2: get("pump2")?.is_on ? 1 : 0,
         servo2: get("servo2")?.is_on ? 1 : 0,
+        heater2: get("heater2")?.is_on ? 1 : 0,
       };
 
       const getMode = (id: string) => get(id)?.mode ?? "manual";
       const { data: thresholds } = await supabase
         .from("node_thresholds")
-        .select("node_id, temp_max, soil_min, rain_max");
+        .select("node_id, temp_max, temp_min, soil_min, rain_max");
 
       const node1Id = `${device_id}-node1`;
       const node2Id = `${device_id}-node2`;
@@ -110,13 +112,15 @@ Deno.serve(async (req) => {
           fan: { on: get("fan")?.is_on ? 1 : 0, mode: getMode("fan") },
           pump: { on: get("pump")?.is_on ? 1 : 0, mode: getMode("pump") },
           servo: { on: get("servo")?.is_on ? 1 : 0, mode: getMode("servo") },
-          thresholds: { temp_max: t1?.temp_max ?? 35, soil_min: t1?.soil_min ?? 30, rain_max: t1?.rain_max ?? 50 },
+          heater: { on: get("heater")?.is_on ? 1 : 0, mode: getMode("heater") },
+          thresholds: { temp_max: t1?.temp_max ?? 35, temp_min: t1?.temp_min ?? 15, soil_min: t1?.soil_min ?? 30, rain_max: t1?.rain_max ?? 50 },
         },
         node2: {
           fan: { on: get("fan2")?.is_on ? 1 : 0, mode: getMode("fan2") },
           pump: { on: get("pump2")?.is_on ? 1 : 0, mode: getMode("pump2") },
           servo: { on: get("servo2")?.is_on ? 1 : 0, mode: getMode("servo2") },
-          thresholds: { temp_max: t2?.temp_max ?? 35, soil_min: t2?.soil_min ?? 30, rain_max: t2?.rain_max ?? 50 },
+          heater: { on: get("heater2")?.is_on ? 1 : 0, mode: getMode("heater2") },
+          thresholds: { temp_max: t2?.temp_max ?? 35, temp_min: t2?.temp_min ?? 15, soil_min: t2?.soil_min ?? 30, rain_max: t2?.rain_max ?? 50 },
         },
       };
 
@@ -134,7 +138,7 @@ Deno.serve(async (req) => {
 
       const { data: thresholds } = await supabase
         .from("node_thresholds")
-        .select("node_id, temp_max, soil_min, rain_max");
+        .select("node_id, temp_max, temp_min, soil_min, rain_max");
 
       return new Response(
         JSON.stringify({ commands: commands || [], thresholds: thresholds || [] }),
