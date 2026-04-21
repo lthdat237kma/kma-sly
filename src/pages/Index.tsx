@@ -5,6 +5,7 @@ import { HistoryChart } from "@/components/HistoryChart";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { SensorCard } from "@/components/SensorCard";
 import { ConnectionInfo } from "@/components/ConnectionInfo";
+import { ThresholdSettings } from "@/components/ThresholdSettings";
 import { useLatestSensorData, useHistoryData, useDevices, useActuators } from "@/hooks/useIoTData";
 import { Loader2, DatabaseZap, Wifi } from "lucide-react";
 import { toast } from "sonner";
@@ -220,6 +221,14 @@ const Index = () => {
                     />
                   </div>
                 )}
+
+                <div className="mb-6">
+                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-chart-3" />
+                    Ngưỡng cảm biến ({deviceName})
+                  </h2>
+                  <ThresholdSettings nodeId={selectedNode} nodeLabel={deviceName} />
+                </div>
 
                 {nodeChartData.length > 0 && (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
