@@ -30,7 +30,7 @@ export function useLatestSensorData(onNewData?: () => void) {
       setLoading(false);
     };
     fetchLatest();
-    const interval = setInterval(fetchLatest, 30000);
+    const interval = setInterval(fetchLatest, 5000);
 
     const channel = supabase
       .channel(`sensor-realtime-${crypto.randomUUID()}`)
@@ -63,7 +63,7 @@ export function useHistoryData() {
       if (data) setHistory(data);
     };
     fetch();
-    const interval = setInterval(fetch, 30000);
+    const interval = setInterval(fetch, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -81,7 +81,7 @@ export function useDevices(onNewDevice?: () => void) {
       if (data) setDevices(data);
     };
     fetch();
-    const interval = setInterval(fetch, 30000);
+    const interval = setInterval(fetch, 5000);
 
     const channel = supabase
       .channel(`devices-realtime-${crypto.randomUUID()}`)
