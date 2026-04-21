@@ -10,13 +10,14 @@ interface SensorData {
   trend: number[];
 }
 import { Card, CardContent } from "@/components/ui/card";
-import { Thermometer, Droplets, Leaf } from "lucide-react";
+import { Thermometer, Droplets, Leaf, CloudRain } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
 
 const iconMap: Record<string, React.ElementType> = {
   Thermometer,
   Droplets,
   Leaf,
+  CloudRain,
 };
 
 const statusColor = {

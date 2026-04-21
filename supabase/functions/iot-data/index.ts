@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
       const body = await req.json();
 
       // Validate required fields
-      const { device_id, temperature, humidity, soil_moisture, device_name, device_location, mcu, rssi, snr, battery, spreading_factor } = body;
+      const { device_id, temperature, humidity, soil_moisture, rain_level, device_name, device_location, mcu, rssi, snr, battery, spreading_factor } = body;
 
       if (!device_id) {
         return new Response(
@@ -38,6 +38,7 @@ Deno.serve(async (req) => {
           temperature: temperature ?? null,
           humidity: humidity ?? null,
           soil_moisture: soil_moisture ?? null,
+          rain_level: rain_level ?? null,
         });
 
       if (sensorError) {

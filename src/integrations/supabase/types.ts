@@ -83,6 +83,7 @@ export type Database = {
           device_id: string
           humidity: number | null
           id: string
+          rain_level: number | null
           soil_moisture: number | null
           temperature: number | null
         }
@@ -91,6 +92,7 @@ export type Database = {
           device_id: string
           humidity?: number | null
           id?: string
+          rain_level?: number | null
           soil_moisture?: number | null
           temperature?: number | null
         }
@@ -99,6 +101,7 @@ export type Database = {
           device_id?: string
           humidity?: number | null
           id?: string
+          rain_level?: number | null
           soil_moisture?: number | null
           temperature?: number | null
         }
