@@ -184,8 +184,8 @@ const Index = () => {
             const nodeChartData = deviceHistory.map((r) => ({
               time: new Date(r.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
               temperature: r.temperature ?? 0,
-              humidity: r.humidity ?? 0,
               soilMoisture: r.soil_moisture ?? 0,
+              rainLevel: r.rain_level ?? 0,
             }));
 
             return (
