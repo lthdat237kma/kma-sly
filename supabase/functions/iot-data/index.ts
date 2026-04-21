@@ -113,14 +113,38 @@ Deno.serve(async (req) => {
           pump: { on: get("pump")?.is_on ? 1 : 0, mode: getMode("pump") },
           servo: { on: get("servo")?.is_on ? 1 : 0, mode: getMode("servo") },
           heater: { on: get("heater")?.is_on ? 1 : 0, mode: getMode("heater") },
-          thresholds: { temp_max: t1?.temp_max ?? 35, temp_min: t1?.temp_min ?? 15, soil_min: t1?.soil_min ?? 30, rain_max: t1?.rain_max ?? 50 },
+          thresholds: {
+            temp_max: t1?.temp_max ?? 35,
+            temp_min: t1?.temp_min ?? 15,
+            soil_min: t1?.soil_min ?? 30,
+            soil_max: t1?.rain_max ?? 80,
+            rain_max: t1?.rain_max ?? 80,
+          },
+          rules: {
+            pump: "ON if soil < soil_min, OFF if soil > soil_max",
+            fan: "ON if temp > temp_max",
+            heater: "ON if temp < temp_min",
+            servo: "CLOSE if rain detected (rain_level > 0)",
+          },
         },
         node2: {
           fan: { on: get("fan2")?.is_on ? 1 : 0, mode: getMode("fan2") },
           pump: { on: get("pump2")?.is_on ? 1 : 0, mode: getMode("pump2") },
           servo: { on: get("servo2")?.is_on ? 1 : 0, mode: getMode("servo2") },
           heater: { on: get("heater2")?.is_on ? 1 : 0, mode: getMode("heater2") },
-          thresholds: { temp_max: t2?.temp_max ?? 35, temp_min: t2?.temp_min ?? 15, soil_min: t2?.soil_min ?? 30, rain_max: t2?.rain_max ?? 50 },
+          thresholds: {
+            temp_max: t2?.temp_max ?? 35,
+            temp_min: t2?.temp_min ?? 15,
+            soil_min: t2?.soil_min ?? 30,
+            soil_max: t2?.rain_max ?? 80,
+            rain_max: t2?.rain_max ?? 80,
+          },
+          rules: {
+            pump: "ON if soil < soil_min, OFF if soil > soil_max",
+            fan: "ON if temp > temp_max",
+            heater: "ON if temp < temp_min",
+            servo: "CLOSE if rain detected (rain_level > 0)",
+          },
         },
       };
 

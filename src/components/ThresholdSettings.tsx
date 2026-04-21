@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Thermometer, ThermometerSnowflake, Leaf, CloudRain, Save } from "lucide-react";
+import { Thermometer, ThermometerSnowflake, Leaf, Droplets, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -63,7 +63,7 @@ export function ThresholdSettings({ nodeId, nodeLabel }: Props) {
     { key: "temp_min" as const, label: "Nhiệt độ tối thiểu", unit: "°C", icon: ThermometerSnowflake, hint: "Đèn sưởi bật khi nhiệt độ thấp hơn ngưỡng" },
     { key: "temp_max" as const, label: "Nhiệt độ tối đa", unit: "°C", icon: Thermometer, hint: "Quạt bật khi nhiệt độ vượt ngưỡng" },
     { key: "soil_min" as const, label: "Độ ẩm đất tối thiểu", unit: "%", icon: Leaf, hint: "Bơm bật khi độ ẩm thấp hơn ngưỡng" },
-    { key: "rain_max" as const, label: "Lượng mưa tối đa", unit: "mm", icon: CloudRain, hint: "Mái che đóng khi mưa vượt ngưỡng" },
+    { key: "rain_max" as const, label: "Độ ẩm đất tối đa", unit: "%", icon: Droplets, hint: "Bơm tắt khi độ ẩm vượt ngưỡng. Mái che đóng khi có mưa." },
   ];
 
   return (

@@ -101,7 +101,7 @@ const Index = () => {
     autoCondition: a.actuator_id.startsWith("pump") ? "Bật khi độ ẩm đất < ngưỡng"
       : a.actuator_id.startsWith("fan") ? "Bật khi nhiệt độ > ngưỡng"
       : a.actuator_id.startsWith("heater") ? "Bật khi nhiệt độ < ngưỡng tối thiểu"
-      : "Đóng mái khi lượng mưa > ngưỡng",
+      : "Đóng mái khi phát hiện mưa",
   }));
 
   if (loading) {
