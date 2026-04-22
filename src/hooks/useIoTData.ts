@@ -30,7 +30,8 @@ export function useLatestSensorData(onNewData?: () => void) {
       setLoading(false);
     };
     fetchLatest();
-    const interval = setInterval(fetchLatest, 5000);
+    // Fallback nhẹ phòng khi WebSocket bị rớt; Realtime mới là nguồn chính
+    const interval = setInterval(fetchLatest, 15000);
 
     const channel = supabase
       .channel(`sensor-realtime-${crypto.randomUUID()}`)
@@ -63,8 +64,21 @@ export function useHistoryData() {
       if (data) setHistory(data);
     };
     fetch();
-    const interval = setInterval(fetch, 5000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetch, 15000);
+
+    const channel = supabase
+      .channel(`history-realtime-${crypto.randomUUID()}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "sensor_readings" }, (payload) => {
+        const newReading = payload.new as SensorReading;
+        setHistory((prev) => {
+          const next = [...prev, newReading];
+          // Giữ tối đa 100 điểm gần nhất
+          return next.length > 100 ? next.slice(next.length - 100) : next;
+        });
+      })
+      .subscribe();
+
+    return () => { clearInterval(interval); supabase.removeChannel(channel); };
   }, []);
 
   return history;
